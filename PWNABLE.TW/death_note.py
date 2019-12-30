@@ -9,8 +9,6 @@ context(terminal=['tmux', 'new-window'])
 context.log_level = 'DEBUG'
 
 
-
-
 debug_set_1 = '''
     set {int}0x0804b108 = 0x804b0c0
     b fclose
@@ -38,13 +36,9 @@ if len(sys.argv) > 2 and sys.argv[1] == 'debug':
     p = process(pwnable)
     gdb.attach(p, debug_set_3)
 elif len(sys.argv) > 1 and sys.argv[1] == 'debug':
-    #p = process("./seethefile", env=env)
-    #gdb.attach(p, debug_set_1)
     p = process(pwnable)
     gdb.attach(p, debug_set_3)
 else:
-    #p = process('./seethefile')
-    #env = {"LD_PRELOAD": os.path.join(os.getcwd(), "/root/libc_32.so.6")}
     #p = process(pwnable)
     p = remote('chall.pwnable.tw', 10201)
 

