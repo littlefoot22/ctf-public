@@ -54,7 +54,6 @@ else:
     #p = process(pwnable)
     p = remote('chall.pwnable.tw', 10204)
 
-
 p.recvuntil("name:")
 p.sendline("NAME")
 p.recvuntil("age:")
