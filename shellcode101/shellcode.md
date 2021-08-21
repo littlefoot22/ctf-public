@@ -54,3 +54,6 @@ syscall                 # this triggers the system call
 binsh:                          # a label marking where the /bin/sh string is
 .string "/bin/sh"
 ```
+
+# NEW GIT 
++ git remote set-url origin https://littlefoot22:********@github.com/littlefoot22/ctf-public.git
