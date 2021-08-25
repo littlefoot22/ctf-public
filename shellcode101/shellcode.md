@@ -116,6 +116,5 @@ pop rax
 syscall
 ```
 
-
 # NEW GIT 
 + git remote set-url origin https://littlefoot22:********@github.com/littlefoot22/ctf-public.git
