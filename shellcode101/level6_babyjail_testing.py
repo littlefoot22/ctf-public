@@ -3,7 +3,6 @@ from pwn import *
 pwnable = './babyjail_level6_testing1'
 
 elf = ELF(pwnable)
-
 context(terminal=['tmux', 'new-window'])
 
 context.log_level = 'DEBUG'
