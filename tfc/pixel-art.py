@@ -45,6 +45,11 @@ def start(argv=[], *a, **kw):
 
 gdbscript = '''
 b main
+b *0x5555555552ce
+b *0x55555555536a
+b *0x5555555557ac
+b *0x55555555566d
+b *0x55555555568a
 '''.format(**locals())
 
 #===========================================================
@@ -103,10 +108,18 @@ def removePixal(row, column):
     io.recvuntil("column>")
     io.sendline(column)
 
+def show():
+    io.recvuntil("Exit\n")
+    io.sendline("4")
+
 io.recvuntil(":")
 io.sendline("50")
 io.recvuntil(":")
 io.sendline("50")
+
+addPixal("0", "0", "5", b"%25$p")
+addPixal("0", "1", "5", b"%17$p")
+show()
 
 addPixal("1", "1", "1", "A")
 addPixal("2", "1", "1", "A")
@@ -117,6 +130,8 @@ addPixal("6", "1", "1", "A")
 addPixal("7", "1", "1", "A")
 addPixal("8", "1", "1", "A")
 addPixal("9", "1", "1", "A")
+addPixal("10", "1", "1", "A")
+addPixal("11", "1", "1", "A")
 removePixal("1", "1")
 removePixal("2", "1")
 removePixal("3", "1")
@@ -126,6 +141,17 @@ removePixal("6", "1")
 removePixal("7", "1")
 removePixal("8", "1")
 removePixal("9", "1")
+removePixal("8", "1")
+
+
+addPixal("1", "1", "1", "A")
+addPixal("2", "1", "1", "A")
+addPixal("3", "1", "1", "A")
+addPixal("4", "1", "1", "A")
+addPixal("5", "1", "1", "A")
+
+#addPixal("6", "1", "1", "A")
+#addPixal("7", "1", "1", "A")
 
 
 io.interactive()
